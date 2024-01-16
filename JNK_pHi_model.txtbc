@@ -1,0 +1,146 @@
+********** MODEL NAME
+GBL-ubi_model
+
+********** MODEL NOTES
+
+********** MODEL STATE INFORMATION
+
+MAP3K(0) = 100 
+act_MAP3K(0) = 0 
+ASK(0) = 100
+act_ASK(0) = 0
+JNK(0) = 100
+act_JNK(0) = 0
+JNK2(0) = 100
+JNK2con(0) = 0
+nASKcon(0) = 100
+act_ASKcon(0) = 0
+pHi(0) = 7
+RNADUSP1(0) = 1
+DUSP1(0) = 0
+Hout(0) = 1
+Hin(0) = 0
+
+********** MODEL PARAMETERS
+kf1z = 0.00321824 
+kf1a = 0.00321824 
+km1a = 2.36644 
+kf1b = 0.00321824 
+km1b = 2.36644
+kf1c = 0.00321824 
+km1c = 2.36644
+kf1d = 0.00321824 
+km1d = 2.36644
+kr1 = 0.00321824 
+
+kf2z = 0.00321824 
+kf2a = 0.1
+kf2c = 0.1
+km2a = 2.36644 
+kf2b = 0.00321824 
+km2b = 2.36644 
+km2c = 2.36644 
+kr2 = 2.36644 
+
+kf3a = 0.00321824 
+km3a = 2.36644 
+kf3b = 0.00321824 
+km3b = 2.36644 
+kr3 = 0.00321824
+km3ia = 0.1
+ki3a = 0.000001 
+ki3b = 0.001
+km3ib = 0.1
+
+kf4a = 1
+km4a = 1
+km4b = 1
+ki4 = 1 
+kf4i = 1
+km4ia = 1 
+km4ib = 1
+kf4base = 1
+kr4 = 1 
+
+kf5 = 1
+km5 = 1 
+kr5 = 1
+
+kf6 = 1
+km6 = 1 
+kr6 = 1
+
+kf8 = 1
+km8 = 1
+kr8 = 0.1
+
+kf9 = 1
+km9 = 1
+kf10 = 0.1
+
+kf11 = 1
+km11a = 1
+km11b = 1
+km11c = 0
+kr11 = 1
+
+
+TNF0 = 0
+Anisomycin0 = 0
+Sorbitol0 = 0
+Timeinput1 = 5000 
+Tinfinput1 = 2000 
+
+
+********** MODEL VARIABLES
+
+TNF = TNF0 *piecewiseIQM(1,andIQM(ge(time,Timeinput1),lt(time,Timeinput1+Tinfinput1)),0) ; 
+
+Anisomycin = Anisomycin0 *piecewiseIQM(1,andIQM(ge(time,Timeinput1),lt(time,Timeinput1+Tinfinput1)),0) ; 
+
+Sorbitol = Sorbitol0 *piecewiseIQM(1,andIQM(ge(time,Timeinput1),lt(time,Timeinput1+Tinfinput1)),0)  ;
+
+totalASK = act_ASKcon;
+pHir= pHi;
+JNKr = act_JNK;
+
+********** MODEL REACTIONS
+
+ASK => act_ASK: R1
+	vf = kf1z + kf1a * TNF * ASK/(km1a + ASK) + kf1b * Anisomycin * ASK/(km1b + ASK) + kf1c * Sorbitol* ASK/(km1c + ASK) + kf1d * act_ASKcon * ASK/(km1d + ASK) - kr1 * act_ASK
+
+MAP3K => act_MAP3K: R2
+	vf = kf2z + kf2a * TNF * MAP3K /(km2a + MAP3K)+ kf2b * Anisomycin * MAP3K /(km2b + MAP3K) + kf2c * Sorbitol* MAP3K /(km2c + MAP3K) -kr2 * act_MAP3K
+
+JNK => act_JNK: R3
+	vf = kf3a * act_ASK * JNK/(km3a+ JNK)+ kf3b * act_MAP3K * JNK/(km3b+ JNK) - ki3a * DUSP1 * act_JNK/(km3ia + act_JNK) - ki3b * JNK2con * act_JNK/(km3ib + act_JNK) - kr3 * act_JNK
+
+=> pHi: R4
+	vf = (kf4base + kf4a * act_ASK/(km4a+ act_ASK)) - (kf4i * Hin /(km4ia + Hin ))  - ki4 * act_JNK * pHi /(km4ib+ pHi) - kr4 * pHi/(km4b+pHi);
+
+JNK2 => JNK2con: R5
+	vf = kf5 * pHi * JNK2/(km5+ JNK2) - kr5 * JNK2con
+
+nASKcon=> act_ASKcon : R6
+	vf = kf6 * pHi * nASKcon/(km6+ nASKcon) - kr6 * act_ASKcon 
+
+   => RNADUSP1: R8
+	vf = kf8 * act_JNK /(km8+ act_JNK) - kr8 * RNADUSP1
+ 
+RNADUSP1 => DUSP1: R9
+	vf = kf9 * RNADUSP1 /(km9+ RNADUSP1) 
+
+DUSP1 =>  : R10
+vf =  kf10 * DUSP1
+
+Hout => Hin : R11
+vf =  kf11 * Hout /(Hout +km11a) - kr11 * Hin /((Hin +km11b)*(1+km11c* pHi))
+
+********** MODEL FUNCTIONS
+
+
+********** MODEL EVENTS
+
+
+********** MODEL MATLAB FUNCTIONS
+

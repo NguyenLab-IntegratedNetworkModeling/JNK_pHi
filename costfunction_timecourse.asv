@@ -1,0 +1,148 @@
+%% cost-function, time-course profile
+function EstimData=costfunction_timecourse(EstimData,irt)
+try
+
+    %% load all related values (information)
+    % parameter names
+    tmp_modelparams=EstimData.model.paramnames;
+    % parameter values
+    tmp_modelparamvals=EstimData.model.paramvals;
+    % trigger time point
+    tmp_StimOn=tmp_modelparamvals(strcmp(tmp_modelparams,'Timeinput1'));
+    % initial conditions
+    tmp_initialConditions=EstimData.model.initials;
+    % maximum step size for MEX
+    tmp_options.maxnumsteps=EstimData.model.maxnumsteps;
+    tmp_model_statenames=EstimData.model.statenames;
+    % error eheck function
+    tmp_check_ss=EstimData.sim.errorcheck;
+
+    %% simulation spec
+    %% sampling time point, simulation time, dosage
+    tmp_obstime=reshape(EstimData.expt.time{irt},1,length(EstimData.expt.time{irt}));
+    tmp_simtime=[linspace(0,tmp_StimOn-1,50) sort(unique([tmp_StimOn tmp_obstime+tmp_StimOn]))];
+    tmp_dose_range=EstimData.expt.dose{irt};
+
+    %% readouts (e.g., pp_ERK, pp_AKT)
+    tmp_varidx=[];
+    tmp_pname=EstimData.expt.names{irt};
+    tmp_varidx=find(ismember(EstimData.model.varnames,tmp_pname));
+
+    %% times before/after triggering stimulation
+    % time index after stimulation
+    tmp_tidx=tmp_simtime>=tmp_StimOn;
+    % time points after stimulaton
+    tmp_tspan=tmp_simtime(tmp_tidx)-tmp_StimOn;
+    % time idx of sampling time points
+    tmp_timidx=ismember(tmp_tspan,tmp_obstime);
+
+    if (irt==1 || irt==2)
+        tmp_modelparamvals(ismember(tmp_modelparams,'TNF0'))=1;
+    elseif (irt==3 || irt==4)
+        tmp_modelparamvals(ismember(tmp_modelparams,'Anisomycin0'))=1;
+    elseif(irt==5 || irt==6)
+        tmp_modelparamvals(ismember(tmp_modelparams,'Sorbitol0'))=1;
+    end
+
+    %% ODE solver (MEX)
+    tmp_initialConditions = GBL_ubi_model;
+    tmp_output=GBL_ubi_model(tmp_simtime,tmp_initialConditions,tmp_modelparamvals',tmp_options);
+
+    %% correlation data
+    if (irt==1||irt==5)
+
+        if (irt==1)
+
+            tmp_modelparamvals1 = tmp_modelparamvals;
+            tmp_modelparamvals1(ismember(tmp_modelparams,'TNF0'))=1;
+
+            tmp_modelparamvals1(ismember(tmp_modelparams,'kf4base'))=tmp_modelparamvals(ismember(tmp_modelparams,'kf4base'))*1.5;
+
+            tmp_output_higher_pH=GBL_ubi_model([0 7000],tmp_initialConditions,tmp_modelparamvals1',tmp_options);
+            trend = tmp_output_higher_pH.statevalues(end,ismember(tmp_model_statenames,'act_JNK')) >= 0.95*tmp_output.statevalues(end,ismember(tmp_model_statenames,'act_JNK'));
+            EstimData.sim.ph(1) = (0.5 + tmp_output_higher_pH.statevalues(end,ismember(tmp_model_statenames,'act_JNK')) - 0.95 * tmp_output.statevalues(end,ismember(tmp_model_statenames,'act_JNK')))*trend;
+            EstimData.sim.ph_result(1:2) = [tmp_output_higher_pH.statevalues(end,ismember(tmp_model_statenames,'act_JNK')) , tmp_output.statevalues(end,ismember(tmp_model_statenames,'act_JNK'))];
+        end
+        if (irt==5)
+            tmp_modelparamvals1 = tmp_modelparamvals;
+            tmp_modelparamvals1(ismember(tmp_modelparams,'Sorbitol0'))=1;
+
+            tmp_modelparamvals1(ismember(tmp_modelparams,'kf4base'))=tmp_modelparamvals(ismember(tmp_modelparams,'kf4base'))*1.5;
+            tmp_output_higher_pH=GBL_ubi_model([0 7000],tmp_initialConditions,tmp_modelparamvals1',tmp_options);
+
+            trend = 0.95*tmp_output_higher_pH.statevalues(end,ismember(tmp_model_statenames,'act_JNK')) <= tmp_output.statevalues(end,ismember(tmp_model_statenames,'act_JNK'));
+
+            EstimData.sim.ph(2) = (0.5+tmp_output.statevalues(end,ismember(tmp_model_statenames,'act_JNK')) - 0.95*tmp_output_higher_pH.statevalues(end,ismember(tmp_model_statenames,'act_JNK')))*trend;
+            EstimData.sim.ph_result(3:4) = [tmp_output_higher_pH.statevalues(end,ismember(tmp_model_statenames,'act_JNK')) , tmp_output.statevalues(end,ismember(tmp_model_statenames,'act_JNK'))];
+
+        end
+
+    end
+
+    if (irt==1)
+        tmp_initialConditions1 = tmp_initialConditions;
+
+        tmp_initialConditions1(ismember(tmp_model_statenames,'ASK')) = tmp_initialConditions(ismember(tmp_model_statenames,'ASK'))*0.1;
+        tmp_output_ASK_KD=GBL_ubi_model(tmp_simtime,tmp_initialConditions1,tmp_modelparamvals',tmp_options);
+
+
+        trend = tmp_output_ASK_KD.statevalues(end,ismember(tmp_model_statenames,'act_JNK')) <= 0.95*tmp_output.statevalues(end,ismember(tmp_model_statenames,'act_JNK'));
+        EstimData.sim.ph(3) = (0.5 + 0.95*tmp_output.statevalues(end,ismember(tmp_model_statenames,'act_JNK')) - tmp_output_ASK_KD.statevalues(end,ismember(tmp_model_statenames,'act_JNK')))*trend;
+    end
+
+
+
+    %% readout variable and state variables
+    tmp_statevalues=tmp_output.statevalues;
+    tmp_variablevalues=tmp_output.variablevalues;
+
+
+    % response profile before stimulation
+    tmp_nt_statevals=tmp_statevalues(~tmp_tidx,:);
+    % response profile after stimulation
+    tmp_fc_statevals=tmp_statevalues(tmp_tidx,:);
+    %     tmp_nt_varvals=tmp_variablevalues(~tidx,:);
+    tmp_fc_varvals=tmp_variablevalues(tmp_tidx,:);
+
+    %% resampled readouts
+    tmp_rdouts=tmp_fc_varvals(tmp_timidx,tmp_varidx);
+
+    EstimData.sim.resampled{irt}=[];
+    EstimData.sim.J{irt}=[];
+
+
+    tmp_exp=EstimData.expt.data{irt};
+    tmp_sim=tmp_rdouts;
+    tmp_S3=tmp_tspan(tmp_timidx)';
+    tmp_S4=EstimData.sim.ci_mask_size;
+
+
+    %% save simulaiton results
+
+    EstimData.sim.resampled{irt}=tmp_rdouts;
+    EstimData.sim.statevalues{irt}=tmp_fc_statevals;
+    EstimData.sim.varvalues{irt}=tmp_fc_varvals;
+    EstimData.sim.tspan{irt}=tmp_tspan;
+
+
+    %% calculate error between exp. and sim.
+    tmp_error=calculateCostFun(tmp_exp,tmp_sim,tmp_S3,tmp_S4,irt);
+
+    %% steady state and negative value check
+    tmp_ss = chek_steadystate(tmp_nt_statevals);
+    tmp_nv = chek_negative(tmp_fc_statevals);
+    EstimData.sim.J{irt} = tmp_error + tmp_ss + tmp_nv;
+
+
+catch
+    EstimData.sim.resampled{irt}=NaN;
+    EstimData.sim.J{irt}=1/eps;
+    EstimData.sim.Jb{irt}=1/eps;
+    EstimData.sim.statevalues{irt}=NaN;
+    EstimData.sim.varvalues{irt}=NaN;
+    EstimData.sim.tspan{irt}=tmp_tspan;
+end
+
+clear -regexp ^tmp_
+
+

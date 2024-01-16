@@ -1,0 +1,138 @@
+%% directory of training data
+tmp_curdir='/home/mgho0003/Desktop/Akt-negative feedback/Model 2/Direct aktIRS connection/16-04-20';
+tmp_filename=strcat(tmp_curdir,'\Training_data2.xlsx');
+
+tmp_sheet='1nM-P-PRAS40';
+tmp_xlRange = 'B3:E8';
+tmp_num = xlsread(tmp_filename,tmp_sheet,tmp_xlRange);
+EstimData.expt.title{1}=tmp_sheet;
+EstimData.expt.description{1}='time course';
+EstimData.expt.ligand{1}='Ins0';
+EstimData.expt.dose{1}=[1]; % 10 nM
+EstimData.expt.data{1}{1}=tmp_num(:,2);
+EstimData.expt.data{1}{2}=tmp_num(:,3);
+EstimData.expt.data{1}{3}=tmp_num(:,4);
+EstimData.expt.names{1}={'phosphopras40r'};
+EstimData.expt.time{1}=tmp_num(:,1); % time points (sec)
+
+
+tmp_sheet='100nM-P-PRAS40';
+tmp_xlRange = 'B3:E8';
+tmp_num = xlsread(tmp_filename,tmp_sheet,tmp_xlRange);
+EstimData.expt.title{2}=tmp_sheet;
+EstimData.expt.description{2}='time course';
+EstimData.expt.ligand{2}='Ins0';
+EstimData.expt.dose{2}=[100]; % 10 nM
+EstimData.expt.data{2}{1}=tmp_num(:,2);
+EstimData.expt.data{2}{2}=tmp_num(:,3);
+EstimData.expt.data{2}{3}=tmp_num(:,4);
+EstimData.expt.names{2}={'phosphopras40r'};
+EstimData.expt.time{2}=tmp_num(:,1); % time points (sec)
+
+tmp_sheet='1nM-PMAKT474';
+tmp_xlRange = 'B3:E8';
+tmp_num = xlsread(tmp_filename,tmp_sheet,tmp_xlRange);
+EstimData.expt.title{3}=tmp_sheet;
+EstimData.expt.description{3}='time course';
+EstimData.expt.ligand{3}='Ins0';
+EstimData.expt.dose{3}=[1]; % 10 nM
+EstimData.expt.data{3}{1}=tmp_num(:,2);
+EstimData.expt.data{3}{2}=tmp_num(:,3);
+EstimData.expt.data{3}{3}=tmp_num(:,4);
+EstimData.expt.names{3}={'phosphoAkt474r'};
+EstimData.expt.time{3}=tmp_num(:,1); % time points (sec)
+
+tmp_sheet='100nM-PMAKT474';
+tmp_xlRange = 'B3:E8';
+tmp_num = xlsread(tmp_filename,tmp_sheet,tmp_xlRange);
+EstimData.expt.title{4}=tmp_sheet;
+EstimData.expt.description{4}='time course';
+EstimData.expt.ligand{4}='Ins0';
+EstimData.expt.dose{4}=[100]; % 10 nM
+EstimData.expt.data{4}{1}=tmp_num(:,2);
+EstimData.expt.data{4}{2}=tmp_num(:,3);
+EstimData.expt.data{4}{3}=tmp_num(:,4);
+EstimData.expt.names{4}={'phosphoAkt474r'};
+EstimData.expt.time{4}=tmp_num(:,1); % time points (sec)
+
+tmp_sheet='1nM-PMAKT309';
+tmp_xlRange = 'B3:E8';
+tmp_num = xlsread(tmp_filename,tmp_sheet,tmp_xlRange);
+EstimData.expt.title{5}=tmp_sheet;
+EstimData.expt.description{5}='time course';
+EstimData.expt.ligand{5}='Ins0';
+EstimData.expt.dose{5}=[1]; % 10 nM
+EstimData.expt.data{5}{1}=tmp_num(:,2);
+EstimData.expt.data{5}{2}=tmp_num(:,3);
+EstimData.expt.data{5}{3}=tmp_num(:,4);
+EstimData.expt.names{5}={'phosphoAkt309r'};
+EstimData.expt.time{5}=tmp_num(:,1); % time points (sec)
+
+
+tmp_sheet='100nM-PMAKT309';
+tmp_xlRange = 'B3:E8';
+tmp_num = xlsread(tmp_filename,tmp_sheet,tmp_xlRange);
+EstimData.expt.title{6}=tmp_sheet;
+EstimData.expt.description{6}='time course';
+EstimData.expt.ligand{6}='Ins0';
+EstimData.expt.dose{6}=[100]; % 10 nM
+EstimData.expt.data{6}{1}=tmp_num(:,2);
+EstimData.expt.data{6}{2}=tmp_num(:,3);
+EstimData.expt.data{6}{3}=tmp_num(:,4);
+EstimData.expt.names{6}={'phosphoAkt309r'};
+EstimData.expt.time{6}=tmp_num(:,1); % time points (min)
+
+tmp_sheet='1nM-PMAKT';
+tmp_xlRange = 'B3:E43';
+tmp_num = xlsread(tmp_filename,tmp_sheet,tmp_xlRange);
+EstimData.expt.title{7}=tmp_sheet;
+EstimData.expt.description{7}='time course';
+EstimData.expt.ligand{7}='Ins0';
+EstimData.expt.dose{7}=[1]; % 10 nM
+EstimData.expt.data{7}{1}=tmp_num(:,2);
+EstimData.expt.data{7}{2}=tmp_num(:,3);
+EstimData.expt.data{7}{3}=tmp_num(:,4);
+EstimData.expt.names{7}={'phosphopmAktr'};
+EstimData.expt.time{7}=tmp_num(:,1); % time points (sec)
+
+
+tmp_sheet='100nM-PMAKT';
+tmp_xlRange = 'B3:E43';
+tmp_num = xlsread(tmp_filename,tmp_sheet,tmp_xlRange);
+EstimData.expt.title{8}=tmp_sheet;
+EstimData.expt.description{8}='time course';
+EstimData.expt.ligand{8}='Ins0';
+EstimData.expt.dose{8}=[100]; % 10 nM
+EstimData.expt.data{8}{1}=tmp_num(:,2);
+EstimData.expt.data{8}{2}=tmp_num(:,3);
+EstimData.expt.data{8}{3}=tmp_num(:,4);
+EstimData.expt.names{8}={'phosphopmAktr'};
+EstimData.expt.time{8}=tmp_num(:,1); % time points (min)
+
+
+%% model parameters
+EstimData.model.paramnames=Akt_NF_MM('parameters');
+EstimData.model.paramvals=[];
+EstimData.model.initialparamvals=Akt_NF_MM('parametervalues');
+EstimData.model.statenames=Akt_NF_MM('states');
+tmp_output=Akt_NF_MM(1:10);
+EstimData.model.initials=Akt_NF_MM;
+EstimData.model.varnames=tmp_output.variables;
+EstimData.model.maxnumsteps=10000; % max steps of MEX
+%% best fitted parameter set
+% paramsets = textread('Finalparamset.txt');
+% param_best = unique(paramsets(:,1:end),'rows');
+EstimData.model.bestfit=Akt_NF_MM('parametervalues');
+% EstimData.model.bestfit= param_best(1,2:end);
+%% simulation data
+EstimData.sim.statevalues{1}=[];
+EstimData.sim.varvalues{1}=[];
+EstimData.sim.resampled{1}=[];
+EstimData.sim.J{1}=[];
+EstimData.sim.Jb{1}=[];
+EstimData.sim.errorcheck= @(x) logical(sum((abs(x(end-1,x(end,:)>1e-3) - x(end,x(end,:)>1e-3))./x(end,x(end,:)>1e-3) > 1e-3) + (x(end,x(end,:)>1e-3)) < -1e-10));
+EstimData.sim.ci_mask_size=0;
+EstimData.sim.Jth={0 0 0 0 0 0 0 0};
+EstimData.sim.Jweight={0.5 0.5 1.5 1 1.5 1 1.2 1};
+
+clear -regexp ^tmp_
