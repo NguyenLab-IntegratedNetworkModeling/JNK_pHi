@@ -3,7 +3,7 @@ close all
 mkdir("figures")
 mkdir("figures/svg")
 
-paramsets = textread('paramset_8_1_24.txt');
+paramsets = textread('paramset_15_1_24.txt');
 [param_best,ic] = unique(paramsets,'rows');
 data_format
 targetparam1=EstimData.model.paramnames(1:52);
